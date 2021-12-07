@@ -6,7 +6,6 @@
  * -----------------------------------------------------------------------------
  */
 export * from './arrays';
-export * from './events';
 export * from './functions';
 export * from './math';
 export * from './objects';

@@ -10,27 +10,30 @@
 /**
  * Generates a random float within the boundaries specified.
  *
- * @param min [number] Minimum value
- * @param max [number] Maximum value
- * @returns [number] Random float within range
+ * @param {number} min Minimum value
+ * @param {number} max Maximum value
+ * @returns {number} Random float within range
  */
 export declare const randomRange: (min: number, max: number) => number;
 /**
- * Generates a random integer that is positive.
+ * Generates a random integer that is positive. Within the safe-integer
+ * boundaries.
  *
- * @returns [number] Random positive integer
+ * @returns {number} Random positive integer
  */
 export declare const randomPositiveInteger: () => number;
 /**
- * Generates a random integer that is negative.
+ * Generates a random integer that is negative. Within the safe-integer
+ * boundaries.
  *
- * @returns [number] Random negative integer
+ * @returns {number} Random negative integer
  */
 export declare const randomNegativeInteger: () => number;
 /**
- * Generates a random integer that may be positive or negative.
+ * Generates a random integer that may be positive or negative. Within the
+ * safe-integer boundaries.
  *
- * @returns [number] Random integer
+ * @returns {number} Random integer
  */
 export declare const randomInteger: () => number;
 /**
@@ -39,22 +42,22 @@ export declare const randomInteger: () => number;
  * If floating-point numbers are provided they will be **rounded** to form an
  * integer.
  *
- * @param min [number] Minimum value
- * @param max [number] Maximum value
- * @returns [number] Random integer
+ * @param {number} min Minimum value
+ * @param {number} max Maximum value
+ * @returns {number} Random integer
  */
 export declare const randomIntegerRange: (min: number, max: number) => number;
 /**
  * Generates a random boolean.
  *
- * @returns [boolean] Random boolean
+ * @returns {boolean} Random boolean
  */
 export declare const randomBoolean: () => boolean;
 /**
  * Generates a random alpha-numeric character. These are in range of
  * 0-9, A-Z, a-z.
  *
- * @returns [string] Random character
+ * @returns {string} Random character
  */
 export declare const randomAlphaNumericCharacter: () => string;
 /**
@@ -62,8 +65,8 @@ export declare const randomAlphaNumericCharacter: () => string;
  * for 32..126 which includes the space character. This range maps to common
  * ASCII characters.
  *
- * @param includeSpace [boolean] If true, the space character will be included
- * @returns [string] Random character
+ * @param {boolean} includeSpace If true, the space character will be included
+ * @returns {string} Random character
  */
 export declare const randomCharacter: (includeSpace?: boolean) => string;
 /**
@@ -74,14 +77,14 @@ export declare const randomCharacter: (includeSpace?: boolean) => string;
  * Note, that if not alphaNumeric, spaces will not be included in the character
  * set.
  *
- * @param length [number] Length of the string
- * @param alphaNumeric [boolean] If true, will only be alpha-numeric
- * @returns [string] Random string
+ * @param {number} length Length of the string
+ * @param {boolean} alphaNumeric If true, will only be alpha-numeric
+ * @returns {string} Random string
  */
 export declare const randomString: (length: number, alphaNumeric?: boolean) => string;
 /**
  * Generates a random Base-36 string.
  *
- * @returns [string] random identifier
+ * @returns {string} Random identifier
  */
 export declare const createUID: () => string;

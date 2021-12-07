@@ -18,16 +18,14 @@ export declare const RegexpURI: RegExp;
 /**
  * Tests if a given input string matches the URI format.
  *
- *
  * --------------------------------------------
  * - Passes: `/some/v4lu3s-go/here`
  * - Fails: `no/prefix/and/$ymbols`
  *
- * @see `RegexpURI`
- * @note Performs type-checking regardless of TypeScript
- * @param input [string] String to test
- * @param allowEmpty [boolean] [default=true] Are empty strings allowed?
- * @returns [boolean] True if it passes the test
+ * @see {@link RegexpURI}
+ * @param {string} input String to test
+ * @param {boolean} allowEmpty [default=true] Are empty strings allowed?
+ * @returns {boolean} True if it passes the test
  */
 export declare const isStringURI: (input: string, allowEmpty?: boolean) => boolean;
 /**
@@ -46,10 +44,9 @@ export declare const RegexpKabob: RegExp;
  * - Passes: `any-values01-here`
  * - Fails: `Caps_and-symbols`
  *
- * @see `RegexpKabob`
- * @note Performs type-checking regardless of TypeScript
- * @param input [string] String to test
- * @param allowEmpty [boolean] [default=true] Are empty strings allowed?
- * @returns [boolean] True if it passes the test
+ * @see {@link RegexpKabob}
+ * @param {string} input String to test
+ * @param {boolean} allowEmpty [default=true] Are empty strings allowed?
+ * @returns {boolean} True if it passes the test
  */
 export declare const isStringKabob: (input: string, allowEmpty?: boolean) => boolean;
