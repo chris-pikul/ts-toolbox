@@ -29,7 +29,11 @@ export const isInteger = (input:number):boolean => {
  * @param {number} input Number to test
  * @returns {boolean} True if number is floating point
  */
-export const isFloat = (input:number):boolean => (!isInteger(input));
+export const isFloat = (input:number):boolean => {
+  if(!input || typeof input !== 'number')
+    return false;
+  return !Number.isInteger(input);
+};
 
 /**
  * Tests if a number is positive, this is 0 inclusive.
