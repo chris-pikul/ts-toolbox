@@ -37,7 +37,7 @@ export function flattenArray<Type>(arr:Array<any>, depth = 1):Array<Type> {
     return arr.reduce((acc:Array<Type>, val:unknown) => {
       if(Array.isArray(val))
         return acc.concat(flattenArray<Type>(val, depth - 1));
-      return val;
+      return [ ...acc, val ];
     }, [] as Array<Type>);
   }
   return arr.slice();
