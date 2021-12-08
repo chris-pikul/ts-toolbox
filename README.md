@@ -1,7 +1,14 @@
-# ts-toolbox
+# big-toolbox
 
 Library of common TypeScript utilities as a package. It's really a grab-bag of different functions and types that I've written over time. I wouldn't use this
 as a browser library, but instead is intended for use with a bundler of some sorts so that tree-shaking can be performed.
+
+## Install
+
+```bash
+npm install --save big-toolbox
+yarn add big-toolbox
+```
 
 ## Included functionality
 
@@ -23,7 +30,7 @@ as a browser library, but instead is intended for use with a bundler of some sor
 * `isNegative` - Type-checks and tests if a number is negative
 * `isOdd` - Type-checks and tests if a number is odd
 * `isEven` - Type-checks and tests if a number is even
-* `isMultipleOf` - Type-checks and tests if a number is a multiple of another
+* `isMultiple` - Type-checks and tests if a number is a multiple of another
 * `positive` - Type-checks and ensures a number is positive (0 inclusive)
 * `negative` - Type-checks and ensures a number is negative (0 exclusive)
 * `clampFloat` - Type-checks and clamps the range of a number
@@ -31,7 +38,6 @@ as a browser library, but instead is intended for use with a bundler of some sor
 * `clampDegree` - Type-checks and clamps a number between 0..360
 * `clampInteger` - Type-checks and clamps the range of a number, truncating decimals.
 * `clampByte` - Type-checks and clamps a number between 0..255, truncating decimals.
-* `clampBits` - Type-checks and clamps a number between 0 and the maximum value delivered by a binary number of (2 << bits).
 * `precisionRound` - Rounds a number to a given level of decimal precision.
 * `precisionFloor` - Floors a number to a given level of decimal precision.
 * `precisionCeil` - Ceils a number to a given level of decimal precision.

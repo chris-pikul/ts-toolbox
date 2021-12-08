@@ -64,32 +64,73 @@ export const isNegative = (input:number):boolean => {
 };
 
 /**
- * Tests if the given number is odd. Will ignore floating-point decimals.
+ * Tests if the given number is odd. For integer numbers this is straight
+ * forward and only requires the input number. For floating-point numbers the
+ * additional `decimals` option will truncate the float to that many decimal
+ * positions, and then check the whole number for oddness. The default number
+ * of decimal places is 2. Negative numbers are absoluted, so they are treated
+ * equally.
+ * 
+ * Examples:
+ * ```
+ * isOdd(23) === true
+ * isOdd(3.1415) === false
+ * isOdd(3.1415, 3) === true
+ * ```
  * 
  * __Type-checks regardless of TypeScript__
  * 
  * @param {number} input Number to test
+ * @param {number} [decimals=2] Number of decimal places to truncate to
  * @returns {number} True if number is odd
  */
-export const isOdd = (input:number):boolean => {
+export const isOdd = (input:number, decimals = 2):boolean => {
   if(!input || typeof input !== 'number')
     return false;
-  return ((input % 2) === 1);
+  
+  if(Number.isInteger(input))
+    return Math.abs(input % 2) === 1;
+
+  const exp = decimals > 0 ? Math.pow(10, decimals) : 1;
+  return Math.abs(Math.trunc(input * exp) % 2) === 1;
 };
 
 /**
- * Tests if the given number is even. Will ignore floating-point decimals.
+ * Tests if the given number is even. For integer numbers this is straight
+ * forward and only requires the input number. For floating-point numbers the
+ * additional `decimals` option will truncate the float to that many decimal
+ * positions, and then check the whole number for eveness. The default number
+ * of decimal places is 2. Negative numbers are absoluted, so they are treated
+ * equally.
+ * 
+ * Examples:
+ * ```
+ * isEven(24) === true
+ * isEven(3.1415) === true
+ * isEven(3.1415, 3) === false
+ * ```
  * 
  * __Type-checks regardless of TypeScript__
  * 
  * @see {@link isOdd}
  * @param {number} input Number to test
+ * @param {number} [decimals=2] Number of decimal points to truncate
  * @returns {boolean} True if number is even
  */
-export const isEven = (input:number):boolean => (!isOdd(input));
+export const isEven = (input:number, decimals = 2):boolean => {
+  if(!input || typeof input !== 'number')
+    return false;
+
+  if(Number.isInteger(input))
+    return Math.abs(input % 2) === 0;
+
+  const exp = decimals > 0 ? Math.pow(10, decimals) : 1;
+  return Math.abs(Math.trunc(input * exp) % 2) === 0;
+};
 
 /**
- * Tests if the given `input` number is a multiple of `multiple`.
+ * Tests if the given `input` number is a multiple of `multiple`. It will treat
+ * negatives the same. Ex. `isMultiple(-6, 2) === true`.
  * 
  * __Type-checks regardless of TypeScript__
  * 
@@ -97,17 +138,18 @@ export const isEven = (input:number):boolean => (!isOdd(input));
  * @param {number} multiple Multiplier to compare against
  * @returns {number} True if number is multiple
  */
-export const isMultipleOf = (input:number, multiple:number):boolean => {
+export const isMultiple = (input:number, multiple:number):boolean => {
   if(!input || typeof input !== 'number')
     return false;
   if(!multiple || typeof multiple !== 'number')
     return false;
 
-  return ((input % multiple) === 0);
+  return Math.abs(input % multiple) === 0;
 };
 
 /**
- * Ensures a number is positive by maxing it against 0.
+ * Ensures a number is positive by maxing it against 0. This is not the same as
+ * absoluting (`Math.abs()`). Any negatives will return as 0.
  * 
  * __Type-checks regardless of TypeScript__
  * 
@@ -148,18 +190,23 @@ export const clampFloat = (input:number, min = 0, max:number = Number.MAX_VALUE)
 export const clampUnit = (input:number):number => {
   if(!input || typeof input !== 'number')
     return 0;
-  clampFloat(input, 0.0, 1.0);
+  return Math.min(Math.max(input, 0.0), 1.0);
 };
 
 /**
- * Clamps a value into a floating-point number for degrees (0..360)
+ * Clamps a value into a floating-point number for degrees (0..360).
+ * Returns 0 on invalid input.
  * 
  * __Type-checks regardless of TypeScript__
  * 
  * @param {number} input Number to clamp
  * @returns {number} Value between 0..360
  */
-export const clampDegree = (input:number):number => clampFloat(input, 0.0, 360.0);
+export const clampDegree = (input:number):number => {
+  if(!input || typeof input !== 'number')
+    return 0;
+  return Math.min(Math.max(input, 0.0), 360.0);
+};
 
 /**
  * Clamps the given value to be within the given range.
@@ -190,22 +237,6 @@ export const clampInteger = (input:number, min = 0, max:number = Number.MAX_VALU
 export const clampByte = (input:number):number => clampInteger(input, 0, 255);
 
 /**
- * Clamps an incoming number between 0 and the maximum value provided by a
- * number generated from the number of bits.
- * 
- * __Type-checks regardless of TypeScript__
- * 
- * @param {number} input Number to clamp
- * @param {number} bits Number of bits to clamp to
- * @returns {number} Number as integer
- */
-export const clampBits = (input:number, bits:number):number => {
-  const cBits = bits < 1 ? 1 : bits;
-  const max = 2 << (cBits - 1);
-  return clampInteger(input, 0, max);
-};
-
-/**
  * Rounds a number from a given number of decimal places. Example:
  * `precisionRound(3.14159, 2) == 3.14`
  * 
@@ -220,7 +251,7 @@ export const precisionRound = (input:number, decimals = 0):number => {
 
 /**
  * Floors a number from a given number of decimal places. Example:
- * `precisionFloor(3.1415, 2) == 3.10`
+ * `precisionFloor(3.1415, 2) == 3.14`
  * 
  * @param {number} input Input number
  * @param {number} decimals Which decimal place to round from
@@ -233,7 +264,7 @@ export const precisionFloor = (input:number, decimals = 0):number => {
 
 /**
  * Ceils a number from a given number of decimal places. Example:
- * `precisionCeil(3.1415, 2) == 3.19`
+ * `precisionCeil(3.1415, 2) == 3.15`
  * 
  * @param {number} input Input number
  * @param {number} decimals Which decimal place to round from
