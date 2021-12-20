@@ -7,8 +7,14 @@
  */
 /* eslint-disable id-length */
 
-import { degToRad, radToDeg, randomRange } from '..';
-import { equals, clampFloat } from '../math';
+import {
+  equals,
+  clampFloat,
+  degToRad,
+  radToDeg,
+} from '../math';
+
+import { randomRange } from '../random';
 
 /**
  * 2-dimensional vector
