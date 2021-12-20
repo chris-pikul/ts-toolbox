@@ -7,7 +7,7 @@
  */
 /* eslint-disable id-length */
 
-import { degToRad, radToDeg } from '..';
+import { degToRad, radToDeg, randomRange } from '..';
 import { equals, clampFloat } from '../math';
 
 /**
@@ -54,6 +54,30 @@ export type NumericalReduceFunc = (acc:number, val:number, componentIndex:number
  * 2-dimensional vector
  */
 export default class Vector2 implements IVector2 {
+  /**
+   * Generates a random unit Vector2. The length of which is 1.
+   * 
+   * @returns {Vector2} New Vector2 object
+   */
+  public static random():Vector2 {
+    return (new Vector2(Math.random(), Math.random())).normalize();
+  }
+
+  /**
+   * Generates a random Vector2 within the range given. This Vector2 is not
+   * normalized. The same range is used for both components but not the same
+   * values.
+   * 
+   * @param {number} min Minimum value
+   * @param {number} max Maximum value
+   * @returns {Vector2} New Vector2 object
+   */
+  public static randomRange(min:number, max:number):Vector2 {
+    const x = randomRange(min, max);
+    const y = randomRange(min, max);
+    return new Vector2(x, y);
+  }
+
   /**
    * The "X" component as a floating-point number.
    */
