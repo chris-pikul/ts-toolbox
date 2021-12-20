@@ -1,6 +1,6 @@
 {
   "name": "big-toolbox",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Library of common TypeScript utilities",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
