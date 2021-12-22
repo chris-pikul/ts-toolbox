@@ -6,6 +6,9 @@
  * -----------------------------------------------------------------------------
  */
 
+// Regular Expression for matching any viable number
+const regexpNumbers = /(-?[\d.]+[\d.e]*-?\d*)/g;
+
 /**
  * Generic Vector class that supports any number of components, operations
  * between different Vectors, and general math.
@@ -94,7 +97,8 @@ export default class Vector {
    * - `number`: Either the number of components if it's the only argument, or
    *    the start of value initializers if more than 1 argument is provided.
    * - `string`: Will attempt to parse the incoming string to find a valid
-   *    array of numbers to denote each component.
+   *    array of numbers to denote each component. This will grab any numbers it
+   *    can find using regexp and will not inforce formatting or delimiters.
    * - `Array`: An array will be interpreted as a list of components and must
    *    contain at least 1 entry and all indices being numbers.
    * - `Vector`: Directly clones another Vector object. Any additional
@@ -177,7 +181,15 @@ export default class Vector {
           this.#components[ind] = 0.0;
       }
     } else if(typeof arg === 'string') {
-      // Parse string
+      // Parse string using a regular expression
+      const values = [ ...arg.matchAll(regexpNumbers) ]
+        .map(match => parseFloat(match[0]));
+
+      if(!values || values.length === 0)
+        throw new TypeError(`Vector was constructed with a string that could not be parsed.`);
+
+      this.#count = values.length;
+      this.#components = [ ...values ];
     } else if(typeof arg === 'object') {
       if(Array.isArray(arg)) {
         // For an array, we copy the values directly
