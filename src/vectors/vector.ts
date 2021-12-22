@@ -66,11 +66,18 @@ export default class Vector {
 
     // Manipulators
     this.fill = this.fill.bind(this);
-    this.map = this.map.bind(this);
     this.reset = this.reset.bind(this);
-    this.resize = this.resize.bind(this);
     this.set = this.set.bind(this);
     this.setComponent = this.setComponent.bind(this);
+
+    // Immutable functions
+    this.append = this.append.bind(this);
+    this.ceil = this.ceil.bind(this);
+    this.floor = this.floor.bind(this);
+    this.map = this.map.bind(this);
+    this.resize = this.resize.bind(this);
+    this.round = this.round.bind(this);
+    this.trunc = this.trunc.bind(this);
 
     // Working with other Vectors
     this.difference = this.difference.bind(this);
@@ -242,20 +249,6 @@ export default class Vector {
   }
 
   /**
-   * Runs a mapping function on each component of this Vector and then returns
-   * a new Vector with the components set.
-   * 
-   * @see {@link Array.prototype.map}
-   * @param {Function} func Callback function to run on each component, which
-   * should return a new number value.
-   * @returns {Vector} New Vector object
-   */
-  public map(func:(val:number, ind:number, arr:number[])=>number):Vector {
-    const newArr = [ ...this.#components ].map(func);
-    return new Vector(newArr);
-  }
-
-  /**
    * Resets the vector by setting all values to 0.
    * 
    * @returns {Vector} `this` for method-chaining
@@ -263,32 +256,6 @@ export default class Vector {
   public reset():Vector {
     this.#components.fill(0.0);
     return this;
-  }
-
-  /**
-   * Resizes this Vector to have a new component length. If the requested
-   * number of components is larger then the new components are set to 0. If
-   * the requested number is shorter, then the components are dropped in order.
-   * 
-   * @param numComponents Number of components
-   * @returns {Vector} New Vector object
-   */
-  public resize(numComponents:number):Vector {
-    if(numComponents < 1)
-      throw new TypeError(`Vector.resize() must be provided a new component length of 1 or greater.`);
-
-    if(numComponents === this.#count) {
-      return new Vector(this);
-    } else if(numComponents > this.#count) {
-      const newArr = new Array(numComponents);
-      for(let ind = 0; ind < this.#count; ind++)
-        newArr[ind] = this.#components[ind];
-      for(let ind = this.#count; ind < numComponents; ind++)
-        newArr[ind] = 0.0;
-      return new Vector(newArr);
-    } else if(numComponents < this.#count) {
-      return new Vector(this.#components.slice(0, numComponents));
-    }
   }
 
   /**
@@ -325,6 +292,98 @@ export default class Vector {
     this.#components[ind] = val;
 
     return this;
+  }
+
+  /**
+   * Immutably appends new components onto this Vector and returns the new
+   * Vector object.
+   * 
+   * @param values... New components 
+   * @returns {Vector} New Vector object
+   */
+  public append(...values:number[]):Vector {
+    return new Vector(this, ...values);
+  }
+
+  /**
+   * Immutably ceilings all components of this Vector and returns a new Vector
+   * object.
+   * 
+   * @returns {Vector} New Vector object
+   */
+  public ceil():Vector {
+    return this.map((val:number) => Math.ceil(val));
+  }
+
+  /**
+   * Immutably floors all components of this Vector and returns a new Vector
+   * object.
+   * 
+   * @returns {Vector} New Vector object
+   */
+  public floor():Vector {
+    return this.map((val:number) => Math.floor(val));
+  }
+
+  /**
+   * Runs a mapping function on each component of this Vector and then returns
+   * a new Vector with the components set.
+   * 
+   * @see {@link Array.prototype.map}
+   * @param {Function} func Callback function to run on each component, which
+   * should return a new number value.
+   * @returns {Vector} New Vector object
+   */
+  public map(func:(val:number, ind:number, arr:number[])=>number):Vector {
+    const newArr = [ ...this.#components ].map(func);
+    return new Vector(newArr);
+  }
+
+  /**
+   * Immutably resizes this Vector to have a new length of components.
+   * Additional components are filled with the given `value` if there are more
+   * components then previous. Otherwise the operation is a truncation.
+   * 
+   * @param numComponents Number of components
+   * @param {number} [value=0] New value for components if enlarged
+   * @returns {Vector} New Vector object
+   */
+  public resize(numComponents:number, value = 0.0):Vector {
+    if(numComponents < 1)
+      throw new TypeError(`Vector.resize() must be provided a new component length of 1 or greater.`);
+
+    if(numComponents === this.#count) {
+      return new Vector(this);
+    } else if(numComponents > this.#count) {
+      const newArr = new Array(numComponents);
+      for(let ind = 0; ind < this.#count; ind++)
+        newArr[ind] = this.#components[ind];
+      for(let ind = this.#count; ind < numComponents; ind++)
+        newArr[ind] = value;
+      return new Vector(newArr);
+    } else if(numComponents < this.#count) {
+      return new Vector(this.#components.slice(0, numComponents));
+    }
+  }
+
+  /**
+   * Immutably rounds all components of this Vector and returns a new Vector
+   * object.
+   * 
+   * @returns {Vector} New Vector object
+   */
+  public round():Vector {
+    return this.map((val:number) => Math.round(val));
+  }
+
+  /**
+   * Immutably truncates all components of this Vector into integers and 
+   * returns a new Vector object.
+   * 
+   * @returns {Vector} New Vector object
+   */
+  public trunc():Vector {
+    return this.map((val:number) => Math.floor(val));
   }
 
   /**
