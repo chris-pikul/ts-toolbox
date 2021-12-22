@@ -12,6 +12,69 @@
  */
 export default class Vector {
   /**
+   * Creates a new Vector of given number of components, and fills each
+   * component with a random unit-float (0..1). The resulting Vector is not
+   * normalized.
+   * 
+   * @param {number} count Number of components, 1 or greater
+   * @returns {Vector} New Vector
+   */
+  public static random(count:number):Vector {
+    if(count < 1)
+      throw new TypeError(`Vector.random() must be provided a number of components 1 or greater.`);
+    
+    const arr = new Array(count);
+    for(let ind = 0; ind < count; ind++)
+      arr[ind] = Math.random();
+
+    return new Vector(arr);
+  }
+
+  /**
+   * Creates a new Vector of given number of components, and fills each
+   * component with a random unit-float (0..1). The resulting Vector is then
+   * normalized and returned.
+   * 
+   * @see {@link Vector.random}
+   * @param {number} count Number of components, 1 or greater
+   * @returns {Vector} New Vector
+   */
+  public static randomUnit(count:number):Vector {
+    if(count < 1)
+      throw new TypeError(`Vector.randomUnit() must be provided a number of components 1 or greater.`);
+
+    return Vector.random(count).normalize();
+  }
+
+  /**
+   * Creates a new Vector of given number of components, and fills each
+   * component with a random number within the range specified.
+   * 
+   * @param count Number of components, 1 or greater
+   * @param min Minimum value
+   * @param max Maximum value
+   * @returns {Vector} New Vector
+   */
+  public static randomRange(count:number, min = 0, max = 1):Vector {
+    // Find the actual min and max
+    const actMin = Math.min(min, max);
+    const actMax = Math.max(min, max);
+
+    // Generator for making random numbers within range
+    const gen = () => {
+      const range = actMax - actMin;
+      return (Math.random() * range) + actMin;
+    };
+
+    // Create a new array of components and fill it
+    const arr = new Array(count);
+    for(let ind = 0; ind < count; ind++)
+      arr[ind] = gen();
+
+    return new Vector(arr);
+  }
+
+  /**
    * Components array, holds each component or axis for the vector
    */
   #components:Array<number> = [];
