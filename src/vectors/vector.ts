@@ -56,6 +56,7 @@ export default class Vector {
     this.toString = this.toString.bind(this);
     this.toArray = this.toArray.bind(this);
 
+    // Getters
     this.get = this.get.bind(this);
     this.magnitudeSqr = this.magnitudeSqr.bind(this);
     this.magnitude = this.magnitude.bind(this);
@@ -63,12 +64,17 @@ export default class Vector {
     this.minComponent = this.minComponent.bind(this);
     this.reduce = this.reduce.bind(this);
 
+    // Manipulators
     this.fill = this.fill.bind(this);
     this.map = this.map.bind(this);
     this.reset = this.reset.bind(this);
     this.resize = this.resize.bind(this);
     this.set = this.set.bind(this);
     this.setComponent = this.setComponent.bind(this);
+
+    // Working with other Vectors
+    this.difference = this.difference.bind(this);
+    this.equals = this.equals.bind(this);
 
     // Negotiate the type of the first argument to declare the constructor type
     if(typeof arg === 'number') {
@@ -319,5 +325,47 @@ export default class Vector {
     this.#components[ind] = val;
 
     return this;
+  }
+
+  /**
+   * Calculates the difference between each component of this Vector, compared
+   * with another.
+   * 
+   * If the Vectors are different sizes, then any missing components are treated
+   * as 0's.
+   * 
+   * @param {Vector} other Other Vector
+   * @returns {number} Absolute difference between all components
+   */
+  public difference(other:Vector):number {
+    // Use the smaller (or equal) vector
+    const vecA = this.count <= other.count ? this : other;
+
+    // Use the larger vector
+    const vecB = this.count > other.count ? this : other;
+
+    // Start with the larger Vector and reduce
+    return vecB.reduce((acc, cur, ind) => {
+      // The other might be smaller, so check if this index is out of range
+      const comp = ind > vecA.count ? 0 : other.#components[ind];
+
+      // Return the ABS difference and add it to the accumulator
+      return acc + Math.abs(cur - comp);
+    });
+  }
+
+  /**
+   * Checks if this Vector and another are equal to each other within a given
+   * tolerance (default is Number.EPSILON).
+   * 
+   * If the Vectors are of different sizes, then any missing components are
+   * treated as 0.
+   * 
+   * @param {Vector} other Other Vector
+   * @param {number} [tolerance=Number.EPSILON] Tolerance for equality 
+   * @returns {boolean} True if difference is within tolerance
+   */
+  public equals(other:Vector, tolerance = Number.EPSILON):boolean {
+    return this.difference(other) < tolerance;
   }
 };
