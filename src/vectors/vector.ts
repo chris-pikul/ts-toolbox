@@ -71,12 +71,18 @@ export default class Vector {
     this.setComponent = this.setComponent.bind(this);
 
     // Immutable functions
+    this.abs = this.abs.bind(this);
     this.append = this.append.bind(this);
     this.ceil = this.ceil.bind(this);
+    this.clamp = this.clamp.bind(this);
     this.floor = this.floor.bind(this);
     this.map = this.map.bind(this);
+    this.normalize = this.normalize.bind(this);
+    this.pow = this.pow.bind(this);
     this.resize = this.resize.bind(this);
     this.round = this.round.bind(this);
+    this.scale = this.scale.bind(this);
+    this.sqrt = this.sqrt.bind(this);
     this.trunc = this.trunc.bind(this);
 
     // Working with other Vectors
@@ -295,6 +301,15 @@ export default class Vector {
   }
 
   /**
+   * Immutably absolutes each component of this Vector.
+   * 
+   * @returns {Vector} New Vector object
+   */
+  public abs():Vector {
+    return this.map(val => Math.abs(val));
+  }
+
+  /**
    * Immutably appends new components onto this Vector and returns the new
    * Vector object.
    * 
@@ -313,6 +328,21 @@ export default class Vector {
    */
   public ceil():Vector {
     return this.map((val:number) => Math.ceil(val));
+  }
+
+  /**
+   * Immutably clamps all components of this vector to be within the given
+   * range.
+   * 
+   * @param {number} [min=0] Minimum value
+   * @param {number} [max=1] Maximum value
+   * @returns {Vector} New Vector object
+   */
+  public clamp(min = 0.0, max = 1.0):Vector {
+    const actMin = Math.min(min, max);
+    const actMax = Math.max(min, max);
+
+    return this.map(val => Math.max(Math.min(val, actMax), actMin));
   }
 
   /**
@@ -337,6 +367,30 @@ export default class Vector {
   public map(func:(val:number, ind:number, arr:number[])=>number):Vector {
     const newArr = [ ...this.#components ].map(func);
     return new Vector(newArr);
+  }
+
+  /**
+   * Immutably normalizes this vector so that the new magnitude is 1.
+   * 
+   * @returns {Vector} New Vector object
+   */
+  public normalize():Vector {
+    // Protect against 0 length
+    if(this.#components.every((val:number) => val === 0))
+      return new Vector(this);
+    
+    const len = this.magnitude();
+    return this.map(val => (val / len));
+  }
+
+  /**
+   * Immutably raises each component by the given exponent.
+   * 
+   * @param {number} exp Exponent (raise to the power of)
+   * @returns {Vector} New Vector object
+   */
+  public pow(exp:number):Vector {
+    return this.map(val => Math.pow(val, exp));
   }
 
   /**
@@ -374,6 +428,26 @@ export default class Vector {
    */
   public round():Vector {
     return this.map((val:number) => Math.round(val));
+  }
+
+  /**
+   * Immutably scales this Vector by multiplying all of the components by the
+   * given value.
+   * 
+   * @param {number} mult Multiplier
+   * @returns {Vector} New Vector object
+   */
+  public scale(mult:number):Vector {
+    return this.map(val => (val * mult));
+  }
+
+  /**
+   * Immutably performs a square-rooting on each component of this Vector.
+   * 
+   * @returns {Vector} New Vector object
+   */
+  public sqrt():Vector {
+    return this.map(val => Math.sqrt(val));
   }
 
   /**
