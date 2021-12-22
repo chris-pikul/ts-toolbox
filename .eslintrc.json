@@ -260,7 +260,7 @@
       "warn",
       {
         "before": false,
-        "after": false
+        "after": true
       }
     ],
     "semi-style": ["error", "last"],
