@@ -110,7 +110,7 @@ export const randomCharacter = (includeSpace = false):string => {
  */
 export const randomString = (length:number, alphaNumeric = true):string => {
   const str:string[] = new Array(length);
-  for(let ind = 0;ind < length;ind++)
+  for(let ind = 0; ind < length; ind++)
     str[ind] = alphaNumeric ? randomAlphaNumericCharacter() : randomCharacter();
   return str.join('');
 };
