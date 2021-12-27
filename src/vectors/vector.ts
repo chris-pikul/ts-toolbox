@@ -405,16 +405,23 @@ export default class Vector {
   }
 
   /**
-   * Immutably adds the components of two Vectors together.
+   * Immutably adds the components of two Vectors or a number together.
    * 
    * Any missing components (two different sized Vectors) are replaced with
    * 0 values for the calculation.
    * 
-   * @param {Vector} other Other Vector
+   * If only a single number is used, then it is treated as the value for each
+   * component.
+   * 
+   * @param {number|Vector|Array} other Other Vector
    * @returns {Vector} New Vector object
    */
-  public add(other:Vector):Vector {
-    return this.mapWith(other, (valA, valB) => (valA + valB));
+  public add(other:(Vector|Array<number>|number)):Vector {
+    if(other instanceof Vector || Array.isArray(other))
+      return this.mapWith(other, (valA, valB) => (valA + valB));
+    else if(typeof other === 'number')
+      return this.map(val => (val + other));
+    throw new TypeError(`Vector.add() called without a number, or other Vector object.`);
   }
 
   /**
@@ -481,12 +488,29 @@ export default class Vector {
    * @param other Other Vector
    * @returns {Vector} New Vector object
    */
-  public divide(other:Vector):Vector {
-    const arr = this.#components.map((val:number, ind:number) => {
-      if(ind < other.count)
-        return val / other.get(ind);
-      return 0;
-    });
+  public divide(other:(Vector|Array<number>|number)):Vector {
+    let arr:Array<number>;
+
+    if(other instanceof Vector) {
+      arr = this.#components.map((val:number, ind:number) => {
+        if(ind < other.count)
+          return val / other.get(ind);
+        return 0;
+      });
+    } else if(Array.isArray(other)) {
+      if(other.some((val:unknown) => (typeof val !== 'number')))
+        throw new TypeError(`Vector.divide() was called with an Array that was not entirely numbers.`);
+
+      arr = this.#components.map((val:number, ind:number) => {
+        if(ind < other.length)
+          return val / other[ind];
+        return 0;
+      });
+    } else if(typeof other === 'number') {
+      arr = this.#components.map((val:number) => (val / other));
+    } else {
+      throw new TypeError(`Vector.divide() requires either a Vector, an Array of numbers, or a number.`);
+    }
 
     return new Vector(arr);
   }
@@ -538,36 +562,54 @@ export default class Vector {
    * values, and returning a new value.
    * @returns {Vector} New Vector object 
    */
-  public mapWith(other:Vector, func:VectorMapWithCallback):Vector {
+  public mapWith(other:(Vector|Array<number>), func:VectorMapWithCallback):Vector {
+    const thisArr = this.#components;
+
+    let otherArr:Array<number>;
+    if(other instanceof Vector) {
+      otherArr = other.toArray();
+    } else if(Array.isArray(other)) {
+      if(other.some((val:unknown) => (typeof val !== 'number')))
+        throw new TypeError(`Vector.mapWith() received an array that is not entirely numbers.`);
+      otherArr = other;
+    }
+
     // Use the smaller (or equal) vector
-    const vecA = this.count <= other.count ? this : other;
+    const vecA = thisArr.length <= otherArr.length ? thisArr : otherArr;
 
     // Use the larger vector
-    const vecB = this.count > other.count ? this : other;
+    const vecB = thisArr.length > otherArr.length ? thisArr : otherArr;
 
     // Start the mapping using the larger array
     const arr = vecB.map((val:number, ind:number):number => {
       // Protect against out-of-bounds indices
-      const comp = ind > vecA.count ? 0 : vecA.#components[ind];
+      const comp = ind >= vecA.length ? 0 : vecA[ind];
 
       // Run the function to get the value
-      return func(val, comp, ind, (ind > vecA.count));
+      return func(val, comp, ind, (ind >= vecA.length));
     });
 
     return new Vector(arr);
   }
 
   /**
-   * Immutably multiplies the components of two Vectors together.
+   * Immutably multiplies the components of two Vectors or a number together.
    * 
    * Any missing components (two different sized Vectors) are replaced with
    * 0 values for the calculation.
    * 
-   * @param {Vector} other Other Vector
+   * If only a single number is used, then it is treated as the value for each
+   * component.
+   * 
+   * @param {number|Vector|Array} other Other Vector
    * @returns {Vector} New Vector object
    */
-  public multiply(other:Vector):Vector {
-    return this.mapWith(other, (valA, valB) => (valA * valB));
+  public multiply(other:(Vector|Array<number>|number)):Vector {
+    if(other instanceof Vector || Array.isArray(other))
+      return this.mapWith(other, (valA, valB) => (valA * valB));
+    else if(typeof other === 'number')
+      return this.map(val => (val * other));
+    throw new TypeError(`Vector.multiply() called without a number, or other Vector object.`);
   }
 
   /**
@@ -643,16 +685,23 @@ export default class Vector {
   }
 
   /**
-   * Immutably subtracts the components of two Vectors from each other.
+   * Immutably subtracts the components of two Vectors or a number together.
    * 
    * Any missing components (two different sized Vectors) are replaced with
    * 0 values for the calculation.
    * 
-   * @param {Vector} other Other Vector
+   * If only a single number is used, then it is treated as the value for each
+   * component.
+   * 
+   * @param {number|Vector|Array} other Other Vector
    * @returns {Vector} New Vector object
    */
-  public subtract(other:Vector):Vector {
-    return this.mapWith(other, (valA, valB) => (valA - valB));
+  public subtract(other:(Vector|Array<number>|number)):Vector {
+    if(other instanceof Vector || Array.isArray(other))
+      return this.mapWith(other, (valA, valB) => (valA - valB));
+    else if(typeof other === 'number')
+      return this.map(val => (val - other));
+    throw new TypeError(`Vector.add() called without a number, or other Vector object.`);
   }
 
   /**
