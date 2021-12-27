@@ -6,6 +6,21 @@
  * -----------------------------------------------------------------------------
  */
 
+export type VectorMapCallback = (val:number, ind:number, arr:number[]) => number;
+
+/**
+ * Callback for usage with {@link Vector.mapWith}.
+ * 
+ * @callback VectorMapWithCallback
+ * @param {number} valA First value
+ * @param {number} valB Second value
+ * @param {number} ind Index of the component
+ * @param {boolean} outBounds True if the component index is out-of-bounds
+ * with one of the Vectors.
+ * @returns {number} New value
+ */
+export type VectorMapWithCallback = (valA:number, valB:number, ind?:number, outBounds?:boolean) => number;
+
 // Regular Expression for matching any viable number
 const regexpNumbers = /(-?[\d.]+[\d.e]*-?\d*)/g;
 
@@ -142,13 +157,18 @@ export default class Vector {
     this.append = this.append.bind(this);
     this.ceil = this.ceil.bind(this);
     this.clamp = this.clamp.bind(this);
+    this.concat = this.concat.bind(this);
+    this.divide = this.divide.bind(this);
     this.floor = this.floor.bind(this);
     this.map = this.map.bind(this);
+    this.mapWith = this.mapWith.bind(this);
+    this.multiply = this.multiply.bind(this);
     this.normalize = this.normalize.bind(this);
     this.pow = this.pow.bind(this);
     this.resize = this.resize.bind(this);
     this.round = this.round.bind(this);
     this.scale = this.scale.bind(this);
+    this.subtract = this.subtract.bind(this);
     this.sqrt = this.sqrt.bind(this);
     this.trunc = this.trunc.bind(this);
 
@@ -385,6 +405,19 @@ export default class Vector {
   }
 
   /**
+   * Immutably adds the components of two Vectors together.
+   * 
+   * Any missing components (two different sized Vectors) are replaced with
+   * 0 values for the calculation.
+   * 
+   * @param {Vector} other Other Vector
+   * @returns {Vector} New Vector object
+   */
+  public add(other:Vector):Vector {
+    return this.mapWith(other, (valA, valB) => (valA + valB));
+  }
+
+  /**
    * Immutably appends new components onto this Vector and returns the new
    * Vector object.
    * 
@@ -421,6 +454,44 @@ export default class Vector {
   }
 
   /**
+   * Immutably concats vectors together to form a new one. This is performed by 
+   * "pasting" vectors on the end of this one. For instance, concatenating 2 
+   * Vectors with 2 components each will result in a Vector of 4 components.
+   * 
+   * @param vecs... Vectors to concat
+   * @returns {Vector} New Vector object
+   */
+  public concat(...vecs:(Array<number>[]|Vector[])):Vector {
+    const arrs = vecs.map((vec:(Array<number>|Vector)):Array<number> => {
+      if(vec instanceof Vector)
+        return vec.toArray();
+      else if(Array.isArray(vec))
+        return vec;
+      throw new TypeError(`Vector.concat() requires either arrays of numbers, or Vector objects.`);
+    });
+
+    return new Vector(this.#components.concat(...arrs));
+  }
+
+  /**
+   * Immutably divides the components of this Vector with the components of
+   * another vector. Any missing components that do not line up are returned as
+   * 0.
+   * 
+   * @param other Other Vector
+   * @returns {Vector} New Vector object
+   */
+  public divide(other:Vector):Vector {
+    const arr = this.#components.map((val:number, ind:number) => {
+      if(ind < other.count)
+        return val / other.get(ind);
+      return 0;
+    });
+
+    return new Vector(arr);
+  }
+
+  /**
    * Immutably floors all components of this Vector and returns a new Vector
    * object.
    * 
@@ -439,9 +510,64 @@ export default class Vector {
    * should return a new number value.
    * @returns {Vector} New Vector object
    */
-  public map(func:(val:number, ind:number, arr:number[])=>number):Vector {
+  public map(func:VectorMapCallback):Vector {
     const newArr = [ ...this.#components ].map(func);
     return new Vector(newArr);
+  }
+
+  /**
+   * Immutably maps the components of two Vectors into a new Vector object.
+   * 
+   * Accepts a callback with the signature:
+   * ```typescript
+   * (valA:number, valB:number, ind?:number, outBounds?:boolean) => number;
+   * ```
+   * With the following parameters:
+   * - `valA`: A component value
+   * - `valB`: A component value
+   * - `ind`: The index of the component within the Vectors
+   * - `outBounds`: True if this index is out-of-boundas to one of the Vectors
+   * 
+   * The returned value is then mapped into a new Vector and returned. If the
+   * two vectors are not of the same shape (different component counts), then
+   * any missing components are replaced with 0 values.
+   * 
+   * @param {Vector} other Other Vector
+   * @param {VectorMapWithCallback} func Callback function to be called on each
+   * component of the larger Vector (as number of components) accepting two
+   * values, and returning a new value.
+   * @returns {Vector} New Vector object 
+   */
+  public mapWith(other:Vector, func:VectorMapWithCallback):Vector {
+    // Use the smaller (or equal) vector
+    const vecA = this.count <= other.count ? this : other;
+
+    // Use the larger vector
+    const vecB = this.count > other.count ? this : other;
+
+    // Start the mapping using the larger array
+    const arr = vecB.map((val:number, ind:number):number => {
+      // Protect against out-of-bounds indices
+      const comp = ind > vecA.count ? 0 : vecA.#components[ind];
+
+      // Run the function to get the value
+      return func(val, comp, ind, (ind > vecA.count));
+    });
+
+    return new Vector(arr);
+  }
+
+  /**
+   * Immutably multiplies the components of two Vectors together.
+   * 
+   * Any missing components (two different sized Vectors) are replaced with
+   * 0 values for the calculation.
+   * 
+   * @param {Vector} other Other Vector
+   * @returns {Vector} New Vector object
+   */
+  public multiply(other:Vector):Vector {
+    return this.mapWith(other, (valA, valB) => (valA * valB));
   }
 
   /**
@@ -514,6 +640,19 @@ export default class Vector {
    */
   public scale(mult:number):Vector {
     return this.map(val => (val * mult));
+  }
+
+  /**
+   * Immutably subtracts the components of two Vectors from each other.
+   * 
+   * Any missing components (two different sized Vectors) are replaced with
+   * 0 values for the calculation.
+   * 
+   * @param {Vector} other Other Vector
+   * @returns {Vector} New Vector object
+   */
+  public subtract(other:Vector):Vector {
+    return this.mapWith(other, (valA, valB) => (valA - valB));
   }
 
   /**
