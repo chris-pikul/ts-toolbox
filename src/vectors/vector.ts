@@ -279,7 +279,7 @@ export default class Vector {
    * @throws {Error} if index is out of bounds
    */
   public get(ind:number):number {
-    if(ind < 0 || ind > this.#count)
+    if(ind < 0 || ind >= this.#count)
       throw new Error(`Vector.get() was provided a component index out of bounds "${ind}".`);
     return this.#components[ind];
   }
@@ -335,7 +335,7 @@ export default class Vector {
    * @returns 
    */
   public reduce(func:(acc:number, cur:number, ind:number, arr:number[])=>number, init = 0.0):number {
-    return [ ...this.#components ].reduce(func, init);
+    return this.#components.reduce(func, init);
   }
 
   /**
@@ -387,7 +387,7 @@ export default class Vector {
    * @throws {Error} if index is out of bounds
    */
   public setComponent(ind:number, val:number):Vector {
-    if(ind < 0 || ind > this.#count)
+    if(ind < 0 || ind >= this.#count)
       throw new Error(`Vector.get() was provided a component index out of bounds "${ind}".`);
     
     this.#components[ind] = val;
@@ -468,7 +468,7 @@ export default class Vector {
    * @param vecs... Vectors to concat
    * @returns {Vector} New Vector object
    */
-  public concat(...vecs:(Array<number>[]|Vector[])):Vector {
+  public concat(...vecs:Array<number[]|Vector>):Vector {
     const arrs = vecs.map((vec:(Array<number>|Vector)):Array<number> => {
       if(vec instanceof Vector)
         return vec.toArray();
@@ -697,11 +697,30 @@ export default class Vector {
    * @returns {Vector} New Vector object
    */
   public subtract(other:(Vector|Array<number>|number)):Vector {
-    if(other instanceof Vector || Array.isArray(other))
-      return this.mapWith(other, (valA, valB) => (valA - valB));
-    else if(typeof other === 'number')
-      return this.map(val => (val - other));
-    throw new TypeError(`Vector.add() called without a number, or other Vector object.`);
+    let arr:Array<number>;
+
+    if(other instanceof Vector) {
+      arr = this.#components.map((val:number, ind:number) => {
+        if(ind < other.count)
+          return val - other.get(ind);
+        return val;
+      });
+    } else if(Array.isArray(other)) {
+      if(other.some((val:unknown) => (typeof val !== 'number')))
+        throw new TypeError(`Vector.subtract() was called with an Array that was not entirely numbers.`);
+
+      arr = this.#components.map((val:number, ind:number) => {
+        if(ind < other.length)
+          return val - other[ind];
+        return val;
+      });
+    } else if(typeof other === 'number') {
+      arr = this.#components.map((val:number) => (val - other));
+    } else {
+      throw new TypeError(`Vector.subtract() requires either a Vector, an Array of numbers, or a number.`);
+    }
+
+    return new Vector(arr);
   }
 
   /**
@@ -720,16 +739,17 @@ export default class Vector {
    * @returns {Vector} New Vector object
    */
   public trunc():Vector {
-    return this.map((val:number) => Math.floor(val));
+    return this.map((val:number) => Math.trunc(val));
   }
 
   /**
    * Calculates the difference between each component of this Vector, compared
-   * with another.
+   * with another. The total of each difference is summed and returned.
    * 
    * If the Vectors are different sizes, then any missing components are treated
    * as 0's.
    * 
+   * @see {@link Vector.subtract} as an alternative returning Vectors
    * @param {Vector} other Other Vector
    * @returns {number} Absolute difference between all components
    */
@@ -743,7 +763,7 @@ export default class Vector {
     // Start with the larger Vector and reduce
     return vecB.reduce((acc, cur, ind) => {
       // The other might be smaller, so check if this index is out of range
-      const comp = ind > vecA.count ? 0 : other.#components[ind];
+      const comp = ind >= vecA.count ? 0 : vecA.get(ind);
 
       // Return the ABS difference and add it to the accumulator
       return acc + Math.abs(cur - comp);
