@@ -6,7 +6,16 @@
  * -----------------------------------------------------------------------------
  */
 
-export type VectorMapCallback = (val:number, ind:number, arr:number[]) => number;
+
+/**
+ * Callback signature for a Vector.map() and Vector.mapWith() operation.
+ * 
+ * @param {number} val Incoming value
+ * @param {number} ind Index of the component
+ * @param {Array} arr Array of Vectors components
+ * @returns {number} New value to apply
+ */
+export type VectorMapCallback = (val:number, ind?:number, arr?:number[]) => number;
 
 /**
  * Callback for usage with {@link Vector.mapWith}.
