@@ -8,7 +8,7 @@
 
 
 /**
- * Callback signature for a Vector.map() and Vector.mapWith() operation.
+ * Callback signature for a Vector.map() operation.
  * 
  * @param {number} val Incoming value
  * @param {number} ind Index of the component
