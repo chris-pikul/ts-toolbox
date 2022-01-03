@@ -42,3 +42,35 @@ export function flattenArray<Type>(arr:Array<any>, depth = 1):Array<Type> {
   }
   return arr.slice();
 };
+
+/**
+ * Ensures that the input array is a given fixed-length size. The results are a
+ * new array regardless of if sizing was needed.
+ * 
+ * If the input array is smaller than the desired size then new values are added
+ * to the end of the given `fillValue` value.
+ * 
+ * If the input array is larger than the desired size, it is "cropped" to the
+ * desired size and returned.
+ * 
+ * If the input array is the desired size, then it is cloned and returned. 
+ * 
+ * @param {Array} arr Input array
+ * @param {number} size Desired length
+ * @param {any} [fillValue=null] New value to fill empty indices with 
+ * @returns {Array} New array
+ * @throws {Error} If the size argument is negative
+ */
+export function arrayEnsureSize(arr:Array<any>, size:number, fillValue:any = null):Array<any> {
+  if(size < 0)
+    throw new Error(`arrayEnsureSize() was supplied a negative size, must be a positive value.`);
+  
+  if(arr.length < size) {
+    const fill:Array<any> = (new Array(size - arr.length)).fill(fillValue);
+    return arr.concat(fill);
+  } else if(arr.length > size) {
+    return arr.slice(0, size);
+  }
+
+  return [ ...arr ];
+}
