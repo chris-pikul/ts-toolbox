@@ -6,6 +6,7 @@
  * -----------------------------------------------------------------------------
  */
 
+import { arrayEnsureSize } from '../arrays';
 
 /**
  * Callback signature for a Vector.map() operation.
@@ -31,7 +32,7 @@ export type VectorMapCallback = (val:number, ind?:number, arr?:number[]) => numb
 export type VectorMapWithCallback = (valA:number, valB:number, ind?:number, outBounds?:boolean) => number;
 
 // Regular Expression for matching any viable number
-const regexpNumbers = /(-?[\d.]+[\d.e]*-?\d*)/g;
+export const regexpNumbers = /(-?[\d.]+[\d.e]*-?\d*)/g;
 
 /**
  * Generic Vector class that supports any number of components, operations
@@ -149,6 +150,7 @@ export default class Vector {
 
     // Getters
     this.get = this.get.bind(this);
+    this.getSafe = this.getSafe.bind(this);
     this.magnitudeSqr = this.magnitudeSqr.bind(this);
     this.magnitude = this.magnitude.bind(this);
     this.maxComponent = this.maxComponent.bind(this);
@@ -290,6 +292,23 @@ export default class Vector {
   public get(ind:number):number {
     if(ind < 0 || ind >= this.#count)
       throw new Error(`Vector.get() was provided a component index out of bounds "${ind}".`);
+    return this.#components[ind];
+  }
+
+  /**
+   * Returns an individual component at the given index.
+   * 
+   * Does NOT throw an error for out-of-bounds indices, instead will return the
+   * `alt` value (default is 0.0).
+   * 
+   * @see {@link Vector.get} for the version that throws errors
+   * @param {number} ind Component index
+   * @param {number} alt Alternative value if out-of-bounds index
+   * @returns {number} Value at component index (or alt value)
+   */
+  public getSafe(ind:number, alt = 0.0):number {
+    if(ind < 0 || ind >= this.#count)
+      return alt;
     return this.#components[ind];
   }
 
@@ -794,3 +813,22 @@ export default class Vector {
     return this.difference(other) < tolerance;
   }
 };
+
+/**
+ * Attempts to negotiate the incoming object into an array of numbers with the
+ * given length.
+ * 
+ * @param obj Either a Vector, an Array of numbers, or a number value
+ * @param count Number of components to ensure
+ * @returns {Array} Array of numbers
+ */
+export function vecToArray(obj:(Vector|Array<number>|number), count = 2):Array<number> {
+  if(obj instanceof Vector)
+    return arrayEnsureSize(obj.toArray(), count, 0.0);
+  else if(typeof obj === 'number')
+    return (new Array(count)).fill(0.0);
+  else if(Array.isArray(obj))
+    return arrayEnsureSize(obj, count, 0.0);
+
+  throw new TypeError(`vecToArray() requires either a Vector, an Array of numbers, or a number itself.`);
+}
