@@ -58,6 +58,11 @@ export type Vector2Equiv = (Vector2|Vector|Array<number>|number);
 
 export default class Vector2 extends Vector implements IVector2 {
   /**
+   * Vector2 with both components being 0 (origin)
+   */
+  public static readonly IDENTITY = new Vector2(0);
+
+  /**
    * Faster Vector to Vector2 conversion. Skips the type-checking and component
    * length negotiation. Any missing components (if Vector1) default to 0.
    * 
@@ -139,6 +144,7 @@ export default class Vector2 extends Vector implements IVector2 {
    * thrown. It does not require both but requires at least 1.
    */
   constructor(arg?:Vector2Constructable, arg2?:number) {
+    // Vector2 is always 2 components, so use the backing Vector as such
     super(2);
 
     // Rebind the methods so they return correctly
