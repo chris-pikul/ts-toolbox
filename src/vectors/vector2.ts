@@ -488,4 +488,25 @@ export default class Vector2 extends Vector implements IVector2 {
   public rotateDeg(deg:number):Vector2 {
     return this.rotate(degToRad(deg));
   }
+
+  /**
+   * Normalizes this Vector2 and calculates the angle from positive X-axis.
+   * Shortcuts to `Math.atan2()`.
+   * 
+   * @returns {number} Angle from positive X-axis in Radians
+   */
+  public toRadians():number {
+    const norm = this.normalize();
+    return Math.atan2(norm.y, norm.x);
+  }
+
+  /**
+   * Normalizes this Vector2 and calculates the angle from positive X-axis.
+   * Shortcuts to `Math.atan2()`.
+   * 
+   * @returns {number} Angle from positive X-axis in Degrees
+   */
+  public toDegrees():number {
+    return radToDeg(this.toRadians());
+  }
 };
