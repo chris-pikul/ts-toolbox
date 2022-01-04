@@ -7,7 +7,12 @@
  */
 /* eslint-disable id-length */
 
-import { clampFloat } from '..';
+import {
+  clampFloat,
+  degToRad,
+  radToDeg,
+} from '../math';
+
 import Vector, {
   VectorMapCallback,
   VectorMapWithCallback,
@@ -43,6 +48,13 @@ export type Vector2Constructable = (
   Vector2 |
   IVector2
 );
+
+/**
+ * Any type that can be supplied to a Vector2 method for transformation with
+ * a Vector2.
+ */
+// eslint-disable-next-line no-use-before-define
+export type Vector2Equiv = (Vector2|Vector|Array<number>|number);
 
 export default class Vector2 extends Vector implements IVector2 {
   /**
@@ -150,6 +162,13 @@ export default class Vector2 extends Vector implements IVector2 {
     this.subtract = this.subtract.bind(this);
     this.sqrt = this.sqrt.bind(this);
     this.trunc = this.trunc.bind(this);
+
+    this.angleBetween = this.angleBetween.bind(this);
+    this.distance = this.distance.bind(this);
+    this.dotProduct = this.dotProduct.bind(this);
+    this.rotate = this.rotate.bind(this);
+    this.rotateAround = this.rotateAround.bind(this);
+    this.rotateDeg = this.rotateDeg.bind(this);
 
     // Negotiate the type of the first argument to declare the constructor type
     if(typeof arg === 'number') {
@@ -282,7 +301,7 @@ export default class Vector2 extends Vector implements IVector2 {
     return this.map(Math.abs);
   }
 
-  public override add(other:(Vector2|Vector|Array<number>|number)):Vector2 {
+  public override add(other:Vector2Equiv):Vector2 {
     try {
       const [ otherX, otherY ] = vecToArray(other, 2);
       return new Vector2(this.x + otherX, this.y + otherY);
@@ -299,7 +318,7 @@ export default class Vector2 extends Vector implements IVector2 {
     return this.map(val => clampFloat(val, min, max));
   }
 
-  public override divide(other:(Vector2|Vector|Array<number>|number)):Vector2 {
+  public override divide(other:Vector2Equiv):Vector2 {
     try {
       const [ otherX, otherY ] = vecToArray(other, 2);
       return new Vector2(this.x / otherX, this.y / otherY);
@@ -317,7 +336,7 @@ export default class Vector2 extends Vector implements IVector2 {
     return new Vector2(...newArr);
   }
 
-  public override mapWith(other:(Vector2|Vector|Array<number>), func:VectorMapWithCallback):Vector2 {
+  public override mapWith(other:Vector2Equiv, func:VectorMapWithCallback):Vector2 {
     const otherArr = vecToArray(other, 2);
     
     // Map this vector as array with the other vector to get the new vector
@@ -326,7 +345,7 @@ export default class Vector2 extends Vector implements IVector2 {
     return new Vector2(newArr);
   }
 
-  public override multiply(other:(Vector2|Vector|Array<number>|number)):Vector2 {
+  public override multiply(other:Vector2Equiv):Vector2 {
     try {
       const [ otherX, otherY ] = vecToArray(other, 2);
       return new Vector2(this.x * otherX, this.y * otherY);
@@ -351,7 +370,7 @@ export default class Vector2 extends Vector implements IVector2 {
     return this.multiply(mult);
   }
 
-  public override subtract(other:(Vector2|Vector|Array<number>|number)):Vector2 {
+  public override subtract(other:Vector2Equiv):Vector2 {
     try {
       const [ otherX, otherY ] = vecToArray(other, 2);
       return new Vector2(this.x - otherX, this.y - otherY);
@@ -368,5 +387,99 @@ export default class Vector2 extends Vector implements IVector2 {
     return this.map(Math.trunc);
   }
 
-  
+  /**
+   * Calculates the angle (either radians or degrees) between this Vector2 and
+   * another Vector2 object.
+   * 
+   * @param {Vector2} other Other Vector2 object
+   * @param {boolean} [useDegrees = false] Make the results in degrees 
+   * @returns {number} Angle between the two vectors
+   */
+  public angleBetween(other:Vector2, useDegrees = false):number {
+    const rads = Math.acos(this.dotProduct(other) / (this.magnitude() * other.magnitude()));
+    return useDegrees ? radToDeg(rads) : rads;
+  }
+
+  /**
+   * Calculates the Euclidean distance between two points.
+   * 
+   * @see {@link Vector2.dotProduct} for a squared version
+   * @param other Other Vector2 object
+   * @returns {number} Euclidean distance between the two-points.
+   */
+  public distance(other:Vector2):number {
+    return Math.sqrt(this.dotProduct(other));
+  }
+
+  /**
+   * Calculates the dot-product between this and another Vector2.
+   * 
+   * @param {Vector2} other Other Vector2 object
+   * @returns {number} Dot-product of the two Vector2s
+   */
+  public dotProduct(other:Vector2):number {
+    return (this.x * other.x) + (this.y * other.y);
+  }
+
+  /**
+   * Projects this Vector2 onto another Vector2 and returns a new Vector2 object
+   * of the results.
+   * 
+   * @param {Vector2} other Other Vector2 object
+   * @returns {Vector2} New Vector2 object
+   */
+  public project(other:Vector2):Vector2 {
+    const otherNorm = other.normalize();
+    return otherNorm.scale(this.dotProduct(otherNorm));
+  }
+
+  /**
+   * Rotates this Vector2 by the given radians.
+   * 
+   * @see {@link Vector2.rotateDeg} for the degree version
+   * @param {number} rad Radians
+   * @returns {Vector2} New Vector2 object
+   */
+  public rotate(rad:number):Vector2 {
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+
+    const newX = (this.x * cos) - (this.y * sin);
+    const newY = (this.x * sin) - (this.y * cos);
+
+    return new Vector2(newX, newY);
+  }
+
+  /**
+   * Rotates this Vector2 around a circle centered at the point defined by
+   * `other` with a radius being the distance between this Vector2 and the
+   * other Vector2, using the angle provided. The results are a new Vector2
+   * object that is a point on that circle.
+   * 
+   * @param {Vector2} other Other Vector2 object as centering point
+   * @param {number} ang Angle in radians (or degrees if `useDeg` is true)
+   * @param {boolean} [useDeg = false] If true, `ang` is degrees
+   * @returns {Vector2} New Vector2 object
+   */
+  public rotateAround(other:Vector2, ang:number, useDeg = false):Vector2 {
+    const rads = useDeg ? degToRad(ang) : ang;
+    const cos = Math.cos(rads);
+    const sin = Math.sin(rads);
+
+    const newX = (cos * (this.x - other.x)) - (sin * (this.y - other.y)) + other.x;
+    const newY = (sin * (this.x - other.x)) + (cos * (this.y - other.y)) + other.y;
+
+    return new Vector2(newX, newY);
+  }
+
+  /**
+   * Rotates this Vector2 by the given degrees.
+   * 
+   * @see {@link Vector2.rotate} for the radian version
+   * @param {number} deg Degrees
+   * @returns {Vector2} New Vector2 object
+   */
+  public rotateDeg(deg:number):Vector2 {
+    return this.rotate(degToRad(deg));
+  }
 };
