@@ -175,6 +175,8 @@ export default class Vector2 extends Vector implements IVector2 {
     this.rotate = this.rotate.bind(this);
     this.rotateAround = this.rotateAround.bind(this);
     this.rotateDeg = this.rotateDeg.bind(this);
+    this.toRadians = this.toRadians.bind(this);
+    this.toDegrees = this.toDegrees.bind(this);
 
     // Negotiate the type of the first argument to declare the constructor type
     if(typeof arg === 'number') {

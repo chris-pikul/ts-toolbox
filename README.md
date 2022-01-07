@@ -69,6 +69,71 @@ yarn add big-toolbox
 * `randomString` - Generates a random string of given length.
 * `createUID` - Generates a random Base-36 string.
 
+### Vector __Class__
+
+Class for Vector math. Provided as a generic container that can hold variable number of components.
+
+#### Vector: Properties
+
+* `Vector.cound` - The number of components present in the Vector.
+
+#### Vector: Methods
+
+* `Vector.toString()` - Convert a Vector to string representation
+* `Vector.toArray()` - Convert a Vector to an Array of components
+* `Vector.get()` - Retrieve a component at an index
+* `Vector.getSafe()` - Retrieve a component at an index with out-of-bounds fallback protection
+* `Vector.magnitudeSqr()` - Get the magnitude (or length) of a Vector as a squared value (faster)
+* `Vector.magnitude()` - Get the magnitude (or length) of a Vector
+* `Vector.maxComponent()` - Get the largest component of the Vector
+* `Vector.minComponent()` - Get the smallest component of the Vector
+* `Vector.reduce()` - Perform a reduction callback on the components of the Vector, in order to return a singular value
+* `Vector.fill()` - Fill all components of the Vector with a given value
+* `Vector.reset()` - Reset all components of the Vector to 0.
+* `Vector.set()` - Set all the components of the Vector with variable arguments
+* `Vector.setComponent()` - Set the component of a given index with a given value.
+* `Vector.abs()` - Immutably perform a Math.abs on all components and return a new Vector.
+* `Vector.append()` - Immutably append new components onto the vector (resizing it)
+* `Vector.ceil()` - Immutably perform a Math.ceil on all components and return a new Vector.
+* `Vector.clamp()` - Immutably clamp all components and return a new Vector.
+* `Vector.concat()` - Immutably concatenate vectors together and return a newly resized Vector.
+* `Vector.divide()` - Immutably divide a Vector with another and return a new Vector of the results.
+* `Vector.floor()` - Immutably perform a Math.floor on all components and return a new Vector.
+* `Vector.map()` - Immutably run a mapping function on all components, building a new Vector and returning the results.
+* `Vector.mapWith()` - Immutably run a mapping function on all components, with another Vector "looking" object, and return a new Vector with the results.
+* `Vector.multiply()` - Immutably multiply a Vector with another and return a new Vector of the results.
+* `Vector.normalize()` - Immutably normalize all the components of the Vector so that the resulting length is 1 (unit) and return the new Vector.
+* `Vector.pow()` - Immutably perform an exponential powering of each component, and return a new Vector of the results.
+* `Vector.resize()` - Immutably resize a Vector to have a given number of components.
+* `Vector.round()` - Immutably perform a Math.round and return a new Vector of the results.
+* `Vector.scale()` - Immutably multiply all components by a given scalar and return the results.
+* `Vector.subtract()` - Immutably subtract a Vector from another, and return a new Vector of the results.
+* `Vector.sqrt()` - Immutably perform a square-rooting of each component of a Vector and return the results.
+* `Vector.trunc()` - Immutably perform a Math.trunc on each component and return a new Vector of the results.
+* `Vector.difference()` - Calculate the scalar difference between two vectors
+* `Vector.equals()` - Check the floating-point equivelency between two vectors with a given tolerance.
+
+### Vector2 (extends Vector) __Class__
+
+Extends of of Vector to provide a fixed-length Vector of 2 components. Includes getter/setters for virtual properties X, and Y. Most methods are overriden to change the parameter types and return types for Vector2 usage.
+
+#### Vector2: Properties
+
+* `Vector2.count` - The number of components
+* `Vector2.x` - The X component (first index)
+* `Vector2.y` - The Y component (second index)
+
+#### Vector2: Additional Methods
+
+* `Vector2.angleBetween()` - Calculate the angle produced between to Vector2 points, returns as either radians (default) or degrees with switch.
+* `Vector2.distance()` - Calculate the euclidean distance between two Vector2 points.
+* `Vector2.dotProduct()` - Calculate the dot-product between two Vector2 objects.
+* `Vector2.rotate()` - Rotate the Vector2 by a given radian angle.
+* `Vector2.rotateAround()` - Rotate a Vector2 around a circle difined by the position given by another Vector2.
+* `Vector2.rotateDeg()` - Rotate the Vector2 by a given degree angle.
+* `Vector2.toRadians()` - Interpret the Vector2 as a unit-vector and calculate the radian angle described.
+* `Vector2.toDegrees()` - Interpret the Vector2 as a unit-vector and calculate the degree angle described.
+
 ## Constribution
 
 Feel free to contribute new functionality to this library by issuing a PR.
