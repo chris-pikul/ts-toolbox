@@ -1,9 +1,13 @@
 /**
  * Copyright © 2021 Chris Pikul, All Rights Reserved.
  * 
- * This code base (ts-toolbox) is under the MIT license. See the file at the
- * project root "LICENSE" for more information.
+ * This code base (ts-toolbox or big-toolbox) is under the MIT license. See the 
+ * file at the project root "LICENSE" for more information.
  * -----------------------------------------------------------------------------
+ * 
+ * Provides utilities for manipulating Arrays.
+ * 
+ * @module Arrays
  */
 
 /**

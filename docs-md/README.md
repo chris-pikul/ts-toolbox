@@ -1,3 +1,5 @@
+big-toolbox / [Exports](modules.md)
+
 # big-toolbox
 
 Library of common TypeScript utilities as a package. It's really a grab-bag of different functions and types that I've written over time. I wouldn't use this

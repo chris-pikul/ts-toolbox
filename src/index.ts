@@ -12,3 +12,6 @@ export * from './math';
 export * from './objects';
 export * from './random';
 export * from './strings';
+
+// Vector math classes
+export * from './vectors';

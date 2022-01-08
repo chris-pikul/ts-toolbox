@@ -1,9 +1,11 @@
 /**
  * Copyright © 2021 Chris Pikul, All Rights Reserved.
  * 
- * This code base (ts-toolbox) is under the MIT license. See the file at the
- * project root "LICENSE" for more information.
+ * This code base (ts-toolbox or big-toolbox) is under the MIT license. See the 
+ * file at the project root "LICENSE" for more information.
  * -----------------------------------------------------------------------------
+ * 
+ * Provides a class for Vector (variable component length) operations.
  */
 
 import { arrayEnsureSize } from '../arrays';
@@ -38,7 +40,7 @@ export const regexpNumbers = /(-?[\d.]+[\d.e]*-?\d*)/g;
  * Generic Vector class that supports any number of components, operations
  * between different Vectors, and general math.
  */
-export default class Vector {
+export class Vector {
   /**
    * Creates a new Vector of given number of components, and fills each
    * component with a random unit-float (0..1). The resulting Vector is not
@@ -832,3 +834,4 @@ export function vecToArray(obj:(Vector|Array<number>|number), count = 2):Array<n
 
   throw new TypeError(`vecToArray() requires either a Vector, an Array of numbers, or a number itself.`);
 }
+export default Vector;

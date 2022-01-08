@@ -1,9 +1,12 @@
 /**
  * Copyright © 2021 Chris Pikul, All Rights Reserved.
  * 
- * This code base (ts-toolbox) is under the MIT license. See the file at the
- * project root "LICENSE" for more information.
+ * This code base (ts-toolbox or big-toolbox) is under the MIT license. See the 
+ * file at the project root "LICENSE" for more information.
  * -----------------------------------------------------------------------------
+ * 
+ * Provides a fixed-length 2-component Vector, common in 2D graphics operations.
+ * This class extends the {@link Vector} class.
  */
 /* eslint-disable id-length */
 
@@ -13,7 +16,8 @@ import {
   radToDeg,
 } from '../math';
 
-import Vector, {
+import {
+  Vector,
   VectorMapCallback,
   VectorMapWithCallback,
   regexpNumbers,
@@ -56,7 +60,7 @@ export type Vector2Constructable = (
 // eslint-disable-next-line no-use-before-define
 export type Vector2Equiv = (Vector2|Vector|Array<number>|number);
 
-export default class Vector2 extends Vector implements IVector2 {
+export class Vector2 extends Vector implements IVector2 {
   /**
    * Vector2 with both components being 0 (origin)
    */
@@ -512,3 +516,4 @@ export default class Vector2 extends Vector implements IVector2 {
     return radToDeg(this.toRadians());
   }
 };
+export default Vector2;
